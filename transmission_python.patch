@@ -1,0 +1,132 @@
+Index: libtransmission/Makefile.am
+===================================================================
+--- libtransmission/Makefile.am	(revision 13624)
++++ libtransmission/Makefile.am	(working copy)
+@@ -1,7 +1,8 @@
+ AM_CPPFLAGS = \
+     -I$(top_srcdir) \
+     -D__TRANSMISSION__ \
+-    -DPACKAGE_DATA_DIR=\""$(datadir)"\"
++    -DPACKAGE_DATA_DIR=\""$(datadir)"\" \
++    -fPIC
+ 
+ AM_CFLAGS = \
+     @DHT_CFLAGS@ \
+Index: libtransmission/bencode.c
+===================================================================
+--- libtransmission/bencode.c	(revision 13624)
++++ libtransmission/bencode.c	(working copy)
+@@ -1514,7 +1514,7 @@
+    }
+ }
+ 
+-static size_t
++size_t
+ tr_bencDictSize( const tr_benc * dict )
+ {
+     size_t count = 0;
+Index: libtransmission/bencode.h
+===================================================================
+--- libtransmission/bencode.h	(revision 13624)
++++ libtransmission/bencode.h	(working copy)
+@@ -162,6 +162,8 @@
+ ****
+ ***/
+ 
++size_t    tr_bencDictSize( const tr_benc * dict );
++
+ int       tr_bencDictReserve( tr_benc *, size_t reserveCount );
+ 
+ int       tr_bencDictRemove( tr_benc *, const char * key );
+Index: libtransmission/torrent.c
+===================================================================
+--- libtransmission/torrent.c	(revision 13624)
++++ libtransmission/torrent.c	(working copy)
+@@ -69,6 +69,12 @@
+ ****
+ ***/
+ 
++tr_torrent*
++tr_torrentNext( tr_session * session, tr_torrent * current )
++{
++    return current ? current->next : session->torrentList;
++}
++
+ const char *
+ tr_torrentName( const tr_torrent * tor )
+ {
+Index: libtransmission/torrent.h
+===================================================================
+--- libtransmission/torrent.h	(revision 13624)
++++ libtransmission/torrent.h	(working copy)
+@@ -271,12 +271,6 @@
+     bool                       finishedSeedingByIdle;
+ };
+ 
+-static inline tr_torrent*
+-tr_torrentNext( tr_session * session, tr_torrent * current )
+-{
+-    return current ? current->next : session->torrentList;
+-}
+-
+ /* what piece index is this block in? */
+ static inline tr_piece_index_t
+ tr_torBlockPiece( const tr_torrent * tor, const tr_block_index_t block )
+Index: libtransmission/transmission.h
+===================================================================
+--- libtransmission/transmission.h	(revision 13624)
++++ libtransmission/transmission.h	(working copy)
+@@ -844,6 +844,8 @@
+ ***
+ **/
+ 
++tr_torrent * tr_torrentNext( tr_session * session, tr_torrent * current );
++
+ bool tr_sessionIsTorrentDoneScriptEnabled( const tr_session * );
+ 
+ void tr_sessionSetTorrentDoneScriptEnabled( tr_session *, bool isEnabled );
+Index: third-party/dht/Makefile.am
+===================================================================
+--- third-party/dht/Makefile.am	(revision 13624)
++++ third-party/dht/Makefile.am	(working copy)
+@@ -1,4 +1,5 @@
+ AM_CFLAGS = @PTHREAD_CFLAGS@ 
++AM_CPPFLAGS = -fPIC
+ 
+ noinst_LIBRARIES = libdht.a
+ libdht_a_SOURCES = dht.c
+Index: third-party/libnatpmp/Makefile.am
+===================================================================
+--- third-party/libnatpmp/Makefile.am	(revision 13624)
++++ third-party/libnatpmp/Makefile.am	(working copy)
+@@ -1,6 +1,7 @@
+ noinst_LIBRARIES = libnatpmp.a
+ 
+ AM_CFLAGS = @PTHREAD_CFLAGS@ -DENABLE_STRNATPMPERR
++AM_CPPFLAGS = -fPIC
+ 
+ libnatpmp_a_SOURCES = \
+     getgateway.c \
+Index: third-party/libutp/Makefile.am
+===================================================================
+--- third-party/libutp/Makefile.am	(revision 13624)
++++ third-party/libutp/Makefile.am	(working copy)
+@@ -1,5 +1,4 @@
+-AM_CPPFLAGS = -fno-exceptions -fno-rtti -ansi -DPOSIX
+-
++AM_CPPFLAGS = -fno-exceptions -fno-rtti -ansi -DPOSIX -fPIC
+ noinst_LIBRARIES = libutp.a
+ libutp_a_SOURCES = utp.cpp utp_utils.cpp
+ noinst_HEADERS = StdAfx.h  templates.h  utp_config_example.h  utp.h  utp_config.h utp_utils.h  utypes.h
+Index: third-party/miniupnp/Makefile.am
+===================================================================
+--- third-party/miniupnp/Makefile.am	(revision 13624)
++++ third-party/miniupnp/Makefile.am	(working copy)
+@@ -1,6 +1,7 @@
+ noinst_LIBRARIES = libminiupnp.a
+ 
+ AM_CFLAGS = @PTHREAD_CFLAGS@ -DNDEBUG -D_GNU_SOURCE
++AM_CPPFLAGS = -fPIC
+ 
+ libminiupnp_a_SOURCES = \
+     connecthostport.c \
