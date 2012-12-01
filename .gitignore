@@ -11,3 +11,10 @@
 *.lai
 *.la
 *.a
+
+# Build dir
+build
+
+# Torrent files
+*.torrent
+
