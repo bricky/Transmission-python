@@ -16,8 +16,7 @@ module = Extension('transmission',
                               'src/tr_info.cc',
                               'src/tr_module.cc',
                               'src/tr_session.cc',
-                              'src/tr_torrent.cc',
-                              'src/tr_tracker.cc'])
+                              'src/tr_torrent.cc'])
 
 setup (name = 'transmission',
        version = '0.1',
